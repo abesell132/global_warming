@@ -1,5 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+
 process.on("message", processInfo => {
   axios
     .get(processInfo.url)
@@ -30,9 +31,11 @@ process.on("message", processInfo => {
       console.log(err);
     });
 });
+
 function removeDegree(str) {
   return str.replace("°F", "");
 }
+
 function roundDecimal(float) {
   return Math.round(float * 100) / 100;
 }

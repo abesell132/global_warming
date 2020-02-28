@@ -72,14 +72,14 @@ const zipcodes = [
 // Begin Application
 stageRequests();
 
-for (let a = 0; a < 16; a++) {
+for (let a = 0; a < 12; a++) {
   createChildProcess();
 }
 
 function createChildProcess() {
   const ls = fork("./child.js");
   let iPID = gen.next().value;
-  if (iPID % 50 == 0) {
+  if (iPID % 100 == 0) {
     var checkTime = process.hrtime(startTime);
     console.log(
       "Time Remaining: " +
@@ -204,6 +204,7 @@ function time_remaining(time) {
   let seconds = Math.floor(time - hours * 3600 - minutes * 60);
   return "" + hours + "h" + minutes + "m" + seconds + "s";
 }
+
 function roundDecimal(float) {
   return Math.round(float * 100) / 100;
 }
