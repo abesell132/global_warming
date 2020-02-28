@@ -12,7 +12,7 @@ mongoose.connect(
     useNewUrlParser: true
   }
 );
-
+let datapoints = [];
 var gen = bookmarker();
 let staging = [];
 const zipcodes = [
@@ -72,14 +72,14 @@ const zipcodes = [
 // Begin Application
 stageRequests();
 
-for (let a = 0; a < 4; a++) {
+for (let a = 0; a < 16; a++) {
   createChildProcess();
 }
 
 function createChildProcess() {
   const ls = fork("./child.js");
   let iPID = gen.next().value;
-  if (iPID % 8 == 0) {
+  if (iPID % 50 == 0) {
     var checkTime = process.hrtime(startTime);
     console.log(
       "Time Remaining: " +
@@ -91,8 +91,14 @@ function createChildProcess() {
       roundDecimal(iPID / checkTime[0]),
       staging.length - iPID
     );
+
+    Temperature.insertMany(datapoints).catch(err => {
+      console.log(err);
+    });
+    datapoints = [];
   }
-  ls.send(staging[iPID]);
+
+  if (iPID) ls.send(staging[iPID]);
   ls.on("message", msg => {
     add_to_database(
       msg.zipcode,
@@ -183,15 +189,13 @@ function add_to_database(
   highTemp,
   lowTemp
 ) {
-  const newTemp = new Temperature({
+  datapoints.push({
     zipcode: zipcode,
     high: highTemp,
     average: avgTemp,
     low: lowTemp,
     date: new Date(year + "-" + month + "-" + day)
   });
-
-  newTemp.save();
 }
 
 function time_remaining(time) {
