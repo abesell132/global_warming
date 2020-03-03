@@ -110,7 +110,6 @@ function createChildProcess() {
   }
 
   if (iPID) ls.send({ info: staging[iPID], url: stagedURLS[iPID] });
-  console.log(iPID);
   ls.on("message", msg => {
     add_to_database(
       msg.zipcode,
