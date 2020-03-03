@@ -9,7 +9,7 @@ mongoose.connect(
   }
 );
 
-Temperature.deleteMany({ zipcode: "32301" })
+Temperature.deleteMany({ zipcode: "95814" })
   .then(res => {
     console.log(res);
   })

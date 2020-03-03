@@ -1,6 +1,7 @@
 const fork = require("child_process").fork;
 var startTime = process.hrtime();
 const mongoose = require("mongoose");
+const fs = require("fs");
 
 const Temperature = require("./models/Temperature");
 
@@ -14,12 +15,13 @@ mongoose.connect(
 let datapoints = [];
 var gen = bookmarker();
 let staging = [];
+let stagedURLS = [];
 const zipcodes = [
   // "36104" // Done
   // "85001", // Done
   // "72201", // Done
-   "95814",
-//  "80202"
+  "95814"
+  //  "80202"
   // "06103"
   // "19901", // Running on AWS
   // "32301", // Running on AWS
@@ -66,12 +68,29 @@ const zipcodes = [
   // "20001"
 ];
 
-// Begin Application
 stageRequests();
 
-for (let a = 0; a < 10; a++) {
-  createChildProcess();
-}
+// Begin Application
+
+fs.readFile("status.log", function(err, data) {
+  if (data) {
+    for (let b = 0; b <= data; b++) {
+      iPID = gen.next().value;
+    }
+
+    if (iPID == data) {
+      console.log("Starting scraping at element #: " + iPID);
+      for (let a = 0; a < 10; a++) {
+        createChildProcess();
+      }
+    }
+  } else {
+    // No requests have been made, business as usual
+    for (let a = 0; a < 10; a++) {
+      createChildProcess();
+    }
+  }
+});
 
 function createChildProcess() {
   const ls = fork("./child.js");
@@ -90,7 +109,8 @@ function createChildProcess() {
     );
   }
 
-  if (iPID) ls.send(staging[iPID]);
+  if (iPID) ls.send({ info: staging[iPID], url: stagedURLS[iPID] });
+  console.log(iPID);
   ls.on("message", msg => {
     add_to_database(
       msg.zipcode,
@@ -103,9 +123,19 @@ function createChildProcess() {
     );
   });
   ls.on("exit", code => {
+    if (code == 0) {
+      fs.readFile("status.log", (err, data) => {
+        if (data < iPID) {
+          fs.writeFile("status.log", iPID, function(err) {
+            if (err) {
+              return console.log(err);
+            }
+          });
+        }
+      });
+    }
     if (iPID + 1 < staging.length) {
-     	
-	 createChildProcess();
+      createChildProcess();
     }
     if (iPID % 200 == 0) {
       Temperature.insertMany(datapoints)
@@ -141,6 +171,16 @@ function stageRequests() {
             month,
             day
           });
+          stagedURLS.push(
+            "https://www.farmersalmanac.com/weather-history-results/zipcode-" +
+              zipcodes[a] +
+              "/" +
+              year +
+              "/" +
+              double_digit(month) +
+              "/" +
+              double_digit(day)
+          );
         }
       }
     }
