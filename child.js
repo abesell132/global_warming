@@ -34,6 +34,7 @@ process.on("message", processInfo => {
       })
       .catch(err => {
         console.log(err);
+        process.exit(0);
       });
   }, 50);
 });

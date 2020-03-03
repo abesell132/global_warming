@@ -17,13 +17,13 @@ let staging = [];
 const zipcodes = [
   // "36104" // Done
   // "85001", // Done
-  // "72201" // Done
-  "95814",
+  // "72201", // Done
+  // "95814",
   "80202"
-  // "06103",
-  // "19901",
-  // "32301",
-  // "30303",
+  // "06103"
+  // "19901", // Running on AWS
+  // "32301", // Running on AWS
+  // "30303"
   // "83702",
   // "62701",
   // "46225",
@@ -107,9 +107,13 @@ function createChildProcess() {
       createChildProcess();
     }
     if (iPID % 200 == 0) {
-      Temperature.insertMany(datapoints).catch(err => {
-        console.log(err);
-      });
+      Temperature.insertMany(datapoints)
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
       datapoints = [];
     }
   });
