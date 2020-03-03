@@ -18,8 +18,8 @@ const zipcodes = [
   // "36104" // Done
   // "85001", // Done
   // "72201", // Done
-  // "95814",
-  "80202"
+   "95814",
+//  "80202"
   // "06103"
   // "19901", // Running on AWS
   // "32301", // Running on AWS
@@ -104,12 +104,13 @@ function createChildProcess() {
   });
   ls.on("exit", code => {
     if (iPID + 1 < staging.length) {
-      createChildProcess();
+     	
+	 createChildProcess();
     }
     if (iPID % 200 == 0) {
       Temperature.insertMany(datapoints)
         .then(res => {
-          console.log(res);
+          console.log("Successful Database Entry");
         })
         .catch(err => {
           console.log(err);
