@@ -1,7 +1,6 @@
 const fork = require("child_process").fork;
 var startTime = process.hrtime();
 const mongoose = require("mongoose");
-const fs = require("fs");
 
 const Temperature = require("./models/Temperature");
 
@@ -16,70 +15,70 @@ let datapoints = [];
 var gen = bookmarker();
 let staging = [];
 const zipcodes = [
-  "36104",
-  "99801",
-  "85001",
-  "72201",
-  "95814",
-  "80202",
-  "06103",
-  "19901",
-  "32301",
-  "30303",
-  "96813",
-  "83702",
-  "62701",
-  "46225",
-  "50309",
-  "66603",
-  "40601",
-  "70802",
-  "04330",
-  "21401",
-  "02201",
-  "48933",
-  "55102",
-  "39205",
-  "65101",
-  "59623",
-  "68502",
-  "89701",
-  "03301",
-  "08608",
-  "87501",
-  "12207",
-  "27601",
-  "58501",
-  "43215",
-  "73102",
-  "97301",
-  "17101",
-  "02903",
-  "29217",
-  "57501",
-  "37219",
-  "78701",
-  "84111",
-  "05602",
-  "23219",
-  "98507",
-  "25301",
-  "53703",
-  "82001",
-  "20001"
+  "36104"
+  // "99801",
+  // "85001",
+  // "72201",
+  // "95814",
+  // "80202",
+  // "06103",
+  // "19901",
+  // "32301",
+  // "30303",
+  // "96813",
+  // "83702",
+  // "62701",
+  // "46225",
+  // "50309",
+  // "66603",
+  // "40601",
+  // "70802",
+  // "04330",
+  // "21401",
+  // "02201",
+  // "48933",
+  // "55102",
+  // "39205",
+  // "65101",
+  // "59623",
+  // "68502",
+  // "89701",
+  // "03301",
+  // "08608",
+  // "87501",
+  // "12207",
+  // "27601",
+  // "58501",
+  // "43215",
+  // "73102",
+  // "97301",
+  // "17101",
+  // "02903",
+  // "29217",
+  // "57501",
+  // "37219",
+  // "78701",
+  // "84111",
+  // "05602",
+  // "23219",
+  // "98507",
+  // "25301",
+  // "53703",
+  // "82001"
+  // "20001"
 ];
 
 // Begin Application
 stageRequests();
 
-for (let a = 0; a < 12; a++) {
+for (let a = 0; a < 10; a++) {
   createChildProcess();
 }
 
 function createChildProcess() {
   const ls = fork("./child.js");
   let iPID = gen.next().value;
-  if (iPID % 100 == 0) {
+  if (iPID % 50 == 0) {
     var checkTime = process.hrtime(startTime);
     console.log(
       "Time Remaining: " +
@@ -91,11 +90,6 @@ function createChildProcess() {
       roundDecimal(iPID / checkTime[0]),
       staging.length - iPID
     );
-
-    Temperature.insertMany(datapoints).catch(err => {
-      console.log(err);
-    });
-    datapoints = [];
   }
 
   if (iPID) ls.send(staging[iPID]);
@@ -111,46 +105,16 @@ function createChildProcess() {
     );
   });
   ls.on("exit", code => {
-    if (iPID + 1 < staging.length - 9) {
+    if (iPID + 1 < staging.length) {
       createChildProcess();
     }
+    if (iPID % 200 == 0) {
+      Temperature.insertMany(datapoints).catch(err => {
+        console.log(err);
+      });
+      datapoints = [];
+    }
   });
-}
-
-function double_digit(number) {
-  if (number < 10) {
-    return "0" + number;
-  } else {
-    return number;
-  }
-}
-
-function get_days_in_month(month) {
-  switch (month) {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 8:
-    case 10:
-    case 12:
-      return 31;
-      break;
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-      return 30;
-      break;
-    default:
-      return 28;
-      break;
-  }
-}
-
-function* bookmarker() {
-  var index = 0;
-  while (true) yield index++;
 }
 
 function stageRequests() {
@@ -207,4 +171,41 @@ function time_remaining(time) {
 
 function roundDecimal(float) {
   return Math.round(float * 100) / 100;
+}
+
+// Oh Generators, How I Love You
+function* bookmarker() {
+  var index = 0;
+  while (true) yield index++;
+}
+
+function get_days_in_month(month) {
+  switch (month) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+      return 31;
+      break;
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+      return 30;
+      break;
+    default:
+      return 28;
+      break;
+  }
+}
+
+function double_digit(number) {
+  if (number < 10) {
+    return "0" + number;
+  } else {
+    return number;
+  }
 }
