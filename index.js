@@ -20,11 +20,11 @@ const zipcodes = [
   // "36104" // Done
   // "85001", // Done
   // "72201", // Done
-  "95814"
-  //  "80202"
-  // "06103"
-  // "19901", // Running on AWS
-  // "32301", // Running on AWS
+  // "95814" // Runing on AWS
+  //  "80202" // Running on AWS
+  // "06103" // Running on AWS
+   "19901", // Running on AWS
+  //"32301",
   // "30303"
   // "83702",
   // "62701",

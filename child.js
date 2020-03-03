@@ -43,7 +43,7 @@ process.on("message", processInfo => {
       process.exit(0);
     })
     .catch(err => {
-      console.log(err);
+      console.log("Error: " + processInfo.url);
       process.exit(1);
     });
 });
