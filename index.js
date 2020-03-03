@@ -72,7 +72,7 @@ stageRequests();
 
 // Begin Application
 
-fs.readFile("status.log", function(err, data) {
+fs.readFile("status.txt", function(err, data) {
   if (data) {
     for (let b = 0; b <= data; b++) {
       iPID = gen.next().value;
@@ -123,9 +123,9 @@ function createChildProcess() {
   });
   ls.on("exit", code => {
     if (code == 0) {
-      fs.readFile("status.log", (err, data) => {
+      fs.readFile("status.txt", (err, data) => {
         if (data < iPID) {
-          fs.writeFile("status.log", iPID, function(err) {
+          fs.writeFile("status.txt", iPID, function(err) {
             if (err) {
               return console.log(err);
             }
