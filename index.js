@@ -125,7 +125,9 @@ function createChildProcess() {
     if (code == 0) {
       fs.readFile("status.txt", (err, data) => {
         if (data < iPID) {
-          fs.writeFile("status.txt", iPID, function(err) {
+          fs.writeFile("status.txt", Math.floor(iPID / 200) * 200, function(
+            err
+          ) {
             if (err) {
               return console.log(err);
             }
